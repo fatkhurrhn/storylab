@@ -207,6 +207,8 @@ export default function DetailImages() {
                 )}
             </div>
 
+            <hr className="text-[#355485] pt- pb-1"/>
+
             {/* Related Images */}
             <div className="px-3">
                 <h3 className="text-md font-semibold mb-2 text-[#355485]">

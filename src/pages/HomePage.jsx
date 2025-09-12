@@ -18,7 +18,7 @@ export default function HomePage() {
       <QuickMenu />
       <KategoriSlider />
       <VidMotivasi />
-      <Kontribusi />
+      {/* <Kontribusi /> */}
       <PremiumTools />
       <Populer />
 

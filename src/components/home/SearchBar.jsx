@@ -93,7 +93,7 @@ export default function SearchBar() {
               <input
                 autoFocus
                 type="text"
-                placeholder="Cari fitur, halaman, kategori..."
+                placeholder="Cari mentahan yang kamu butuhkan..."
                 className="flex-1 p-2 text-sm outline-none bg-transparent text-[#355485]"
                 value={queryText}
                 onChange={(e) => setQueryText(e.target.value)}

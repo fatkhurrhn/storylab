@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
     const [username, setUsername] = useState("");
@@ -20,9 +20,11 @@ export default function Login() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
             <div className="max-w-md w-full bg-white rounded-xl shadow-md p-6">
-                <h2 className="text-2xl font-bold text-[#355485] text-center mb-6">
-                    Sign In StoryLab
-                </h2>
+                <Link to="/">
+                    <h2 className="text-2xl font-bold text-[#355485] text-center mb-6">
+                        Sign In StoryLab
+                    </h2>
+                    </Link>
                 <form onSubmit={handleLogin} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">

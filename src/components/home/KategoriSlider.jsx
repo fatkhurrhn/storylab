@@ -25,7 +25,7 @@ function KategoriSlider() {
     }, []);
 
     return (
-        <div className="px-4 mt-8">
+        <div className="px-4 mt-6">
             <h2 className="text-md font-semibold text-[#355485] mb-3">
                 🔍 Jelajahi Kategori
             </h2>

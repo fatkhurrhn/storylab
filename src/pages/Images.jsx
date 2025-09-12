@@ -32,18 +32,31 @@ export default function Images() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
+  // Shuffle array (Fisher-Yates)
+  const shuffleArray = (arr) => {
+    const newArr = [...arr];
+    for (let i = newArr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+    }
+    return newArr;
+  };
+
   // Fetch data Firestore
   const fetchImages = async () => {
     try {
       const q = query(collection(db, "images"), orderBy("createdAt", "desc"));
       const snap = await getDocs(q);
       const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      setImages(data);
 
-      // ambil kategori unik
+      // urutan acak untuk "all"
+      setImages(shuffleArray(data));
+
+      // ambil kategori unik & sort alphabet
       const uniqueCats = [
         ...new Set(data.map((img) => img.category).filter(Boolean)),
-      ];
+      ].sort((a, b) => a.localeCompare(b));
+
       setCategories(["all", ...uniqueCats]);
     } catch (err) {
       console.error("Error fetching images:", err);
@@ -60,10 +73,15 @@ export default function Images() {
   const filteredImages = images.filter((img) => {
     const title = img.title?.toLowerCase() || "";
     const category = img.category?.toLowerCase() || "";
+    const tags = img.tags?.toLowerCase() || "";
     const term = searchTerm.toLowerCase();
 
     const matchSearch =
-      !term || title.includes(term) || category.includes(term);
+      !term ||
+      title.includes(term) ||
+      category.includes(term) ||
+      tags.includes(term);
+
     const matchCategory =
       selectedCategory === "all" ||
       img.category?.toLowerCase() === selectedCategory.toLowerCase();
@@ -82,12 +100,11 @@ export default function Images() {
           {showSearch ? (
             // Mode search: tampilkan input
             <div className="flex items-center w-full gap-2">
-              <i className="ri-search-2-line text-xl text-[#355485]"></i>
               <input
                 type="text"
                 autoFocus
-                placeholder="Cari judul atau kategori..."
-                className="flex-1 p-2 rounded-md border border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-[#4f90c6] text-sm"
+                placeholder="Cari title, kategori, atau tags..."
+                className="flex-1 ml-1 p-1 rounded-md border border-gray-300 bg-white focus:outline-none focus:ring-1 focus:ring-[#4f90c6] text-sm"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -104,9 +121,9 @@ export default function Images() {
           ) : (
             <>
               <Link to="/">
-                  <h1 className="flex items-center font-semibold gap-2 text-[#355485] text-[15px]">
-                    <i className="ri-arrow-left-line"></i> Images
-                  </h1>
+                <h1 className="flex items-center font-semibold gap-2 text-[#355485] text-[15px]">
+                  <i className="ri-arrow-left-line"></i> Images
+                </h1>
               </Link>
               <button
                 className="text-[#355485]"
@@ -127,7 +144,7 @@ export default function Images() {
               key={cat}
               onClick={() => setSelectedCategory(cat)}
               className={`px-4 py-1 rounded-full text-sm whitespace-nowrap border transition ${selectedCategory === cat
-                ? "bg-[#355485] text-white border-[#355485]"
+                  ? "bg-[#355485] text-white border-[#355485]"
                   : "bg-white text-[#355485] border-gray-300 hover:bg-gray-100"
                 }`}
             >

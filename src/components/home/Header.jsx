@@ -9,7 +9,7 @@ function Header() {
                 <div className="flex items-center justify-between -mt-2">
                     <h1 className="text-2xl font-bold text-white">StoryLab</h1>
                     <Link to="/login">
-                        <i className="ri-notification-3-line text-white text-xl"></i>
+                        <i className="ri-user-shared-line text-white text-xl"></i>
                     </Link>
                 </div>
                 <p className="text-sm text-[#d8e8f6] mt-1">
