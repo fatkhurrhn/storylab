@@ -1,7 +1,13 @@
 import React from 'react'
+import BottomNav from '../components/BottomNav'
 
 export default function HomePage() {
   return (
-    <div>HomePage</div>
+    <div>
+      <div>
+        HomePage
+      </div>
+      <BottomNav/>
+    </div>
   )
 }
