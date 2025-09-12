@@ -11,6 +11,7 @@ import ManageVideos from "./pages/admin/ManageVideos";
 import Video from "./pages/Videos";
 import Login from "./pages/settings/Login";
 import ListMenu from "./pages/settings/ListMenu";
+import DetailVideos from "./pages/DetailVideos";
 
 function App() {
   return (
@@ -19,13 +20,13 @@ function App() {
       <Routes>
         {/* Redirect root "/" ke "/home" */}
         <Route path="/" element={<Navigate to="/home" replace />} />
-
         <Route path="/home" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<ListMenu />} />
         <Route path="/tes" element={<Tes />} />
         <Route path="/quotes" element={<Quotes />} />
         <Route path="/videos" element={<Video />} />
+        <Route path="/videos/:id" element={<DetailVideos />} />
         <Route path="/videos/kategori/:id" element={<Video />} />
         <Route path="/images" element={<Images />} />
         <Route path="/images/:id" element={<DetailImages />} />

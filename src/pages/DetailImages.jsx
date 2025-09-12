@@ -82,8 +82,10 @@ export default function DetailImages() {
                 u.pathname = parts.join("/");
                 return u.toString();
             }
-        } catch (e) {
-            // ignore & fallback ke query
+        } catch (err) {
+            console.error("Error fetch detail:", err);
+        } finally {
+            setLoading(false);
         }
         return (
             rawUrl +
