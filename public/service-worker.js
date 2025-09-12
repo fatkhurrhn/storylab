@@ -1,50 +1,76 @@
 const CACHE_NAME = "storylab-cache-v1";
 const OFFLINE_URL = "/offline.html";
 
-const urlsToCache = [
-    "/",
-    "/index.html",
-    "/manifest.json",
-    "/icons/icon-192x192.png",
-    "/icons/icon-512x512.png",
-    OFFLINE_URL
-];
-
-// Install & cache assets
+// Install → cache file penting
 self.addEventListener("install", (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll([
+                "/",
+                "/index.html",
+                "/manifest.json",
+                "/offline.html",
+            ]);
+        })
     );
     self.skipWaiting();
 });
 
-// Activate & cleanup old caches
+// Activate → hapus cache lama
 self.addEventListener("activate", (event) => {
     event.waitUntil(
-        caches.keys().then((names) =>
+        caches.keys().then((keys) =>
             Promise.all(
-                names.filter((name) => name !== CACHE_NAME).map((n) => caches.delete(n))
+                keys.map((key) => {
+                    if (key !== CACHE_NAME) {
+                        return caches.delete(key);
+                    }
+                })
             )
         )
     );
     self.clients.claim();
 });
 
-// Fetch handler
+// Fetch → hanya cache request GET
 self.addEventListener("fetch", (event) => {
+    // Abaikan request selain GET (POST, PUT, DELETE, dll)
     if (event.request.method !== "GET") return;
+
+    // Abaikan request ke chrome-extension://
+    if (event.request.url.startsWith("chrome-extension://")) return;
 
     event.respondWith(
         caches.match(event.request).then((cached) => {
-            return (
-                cached ||
-                fetch(event.request).catch(() => {
+            if (cached) {
+                // kalau ada di cache → return cache dulu
+                return cached;
+            }
+
+            // kalau ga ada di cache → ambil dari network
+            return fetch(event.request)
+                .then((res) => {
+                    // clone response supaya bisa dipakai browser + cache
+                    const resClone = res.clone();
+
+                    // simpan hanya untuk request aman (http/https)
+                    if (
+                        event.request.url.startsWith("http://") ||
+                        event.request.url.startsWith("https://")
+                    ) {
+                        caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(event.request, resClone);
+                        });
+                    }
+
+                    return res;
+                })
+                .catch(() => {
                     // fallback offline
                     if (event.request.mode === "navigate") {
                         return caches.match(OFFLINE_URL);
                     }
-                })
-            );
+                });
         })
     );
 });
