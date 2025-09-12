@@ -22,10 +22,10 @@ function QuickMenu() {
                         <Link
                             key={item.name}
                             to={item.path}
-                            className="flex flex-col items-center"
+                            className="flex flex-col items-centerjustify-center bg-[#f1f6fb] hover:bg-[#e3edf7] rounded-xl p-3 shadow-sm transition"
                         >
                             <i className={`${item.icon} text-2xl text-[#4f90c6]`}></i>
-                            <span className="text-xs mt-1">{item.name}</span>
+                            <span className="text-xs -mt-0">{item.name}</span>
                         </Link>
                     ))}
                 </div>

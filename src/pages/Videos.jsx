@@ -2,19 +2,19 @@ import React, { useState, useEffect, useRef } from "react";
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import BottomNav from "../components/BottomNav";
-import { useNavigate } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 export default function Videos() {
+    const { id } = useParams(); // param kategori (:id)
+
     const [videos, setVideos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeIndex, setActiveIndex] = useState(null);
     const [pausedVideo, setPausedVideo] = useState(null);
     const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState("all");
 
     const videoRefs = useRef([]);
     const reelsContainerRef = useRef(null);
-    const navigate = useNavigate();
 
     // fetch videos
     useEffect(() => {
@@ -25,10 +25,8 @@ export default function Videos() {
                 const vids = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
                 setVideos(vids);
 
-                // kumpulkan kategori unik
-                const cats = [
-                    ...new Set(vids.map((v) => v.category).filter(Boolean)),
-                ];
+                // kategori unik
+                const cats = [...new Set(vids.map((v) => v.category).filter(Boolean))];
                 setCategories(cats);
             } catch (err) {
                 console.error("Error fetching videos:", err);
@@ -39,13 +37,13 @@ export default function Videos() {
         fetchVideos();
     }, []);
 
-    // buka modal di index tertentu
+    // buka modal
     const handleOpen = (index) => {
         setActiveIndex(index);
         document.body.style.overflow = "hidden";
     };
 
-    // setelah modal terbuka, langsung scroll ke index yang dipilih
+    // scroll ke video saat modal dibuka
     useEffect(() => {
         if (activeIndex !== null && reelsContainerRef.current) {
             const container = reelsContainerRef.current;
@@ -67,7 +65,7 @@ export default function Videos() {
         videoRefs.current.forEach((v) => v && v.pause());
     };
 
-    // scroll handling
+    // auto play/pause ketika discroll
     const handleScroll = (e) => {
         const container = e.currentTarget;
         const scrollPosition = container.scrollTop;
@@ -95,6 +93,7 @@ export default function Videos() {
         });
     };
 
+    // play/pause toggle
     const togglePlayPause = (idx) => {
         const video = videoRefs.current[idx];
         if (!video) return;
@@ -107,7 +106,7 @@ export default function Videos() {
         }
     };
 
-    // handle download
+    // download video
     const handleDownload = async (videoUrl, title) => {
         try {
             const response = await fetch(videoUrl);
@@ -116,7 +115,9 @@ export default function Videos() {
             const blobUrl = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = blobUrl;
-            a.download = title ? `${title.replace(/[^a-z0-9]/gi, "_")}.mp4` : "video.mp4";
+            a.download = title
+                ? `${title.replace(/[^a-z0-9]/gi, "_")}.mp4`
+                : "video.mp4";
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(blobUrl);
@@ -127,7 +128,8 @@ export default function Videos() {
         }
     };
 
-    // filter video
+    // filter berdasar kategori dari URL
+    const selectedCategory = id || "all";
     const filteredVideos =
         selectedCategory === "all"
             ? videos
@@ -137,13 +139,10 @@ export default function Videos() {
         <div className="bg-[#fcfeff] min-h-screen text-gray-800">
             {/* Header */}
             <div className="flex items-center justify-between px-3 py-3 border-b border-gray-300 sticky top-0 bg-[#fcfeff] z-40">
-                <div
-                    onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 cursor-pointer"
-                >
+                <Link to="/" className="flex items-center gap-2 cursor-pointer">
                     <i className="ri-arrow-left-line text-xl text-[#355485]"></i>
                     <h1 className="text-[15px] font-semibold text-[#355485]">Videos</h1>
-                </div>
+                </Link>
                 <button className="text-xl text-[#355485] hover:text-[#4f90c6]">
                     <i className="ri-settings-3-line"></i>
                 </button>
@@ -152,26 +151,26 @@ export default function Videos() {
             {/* Categories */}
             {categories.length > 0 && (
                 <div className="overflow-x-auto flex gap-2 px-3 py-2 border-b border-gray-100">
-                    <button
-                        onClick={() => setSelectedCategory("all")}
+                    <Link
+                        to="/videos"
                         className={`px-4 py-1 rounded-full text-sm whitespace-nowrap border transition ${selectedCategory === "all"
-                                ? "bg-[#355485] text-white border-[#355485]" 
+                                ? "bg-[#355485] text-white border-[#355485]"
                                 : "bg-white text-[#355485] border-gray-300 hover:bg-gray-100"
                             }`}
                     >
                         All
-                    </button>
+                    </Link>
                     {categories.map((cat, i) => (
-                        <button
+                        <Link
                             key={i}
-                            onClick={() => setSelectedCategory(cat)}
+                            to={`/videos/kategori/${cat}`}
                             className={`px-4 py-1 rounded-full text-sm whitespace-nowrap border transition ${selectedCategory === cat
-                                    ? "bg-[#355485] text-white border-[#355485]" 
+                                    ? "bg-[#355485] text-white border-[#355485]"
                                     : "bg-white text-[#355485] border-gray-300 hover:bg-gray-100"
                                 }`}
                         >
                             {cat}
-                        </button>
+                        </Link>
                     ))}
                 </div>
             )}
@@ -180,7 +179,7 @@ export default function Videos() {
             <div className="max-w-xl mx-auto px-3 pb-20">
                 {loading ? (
                     <div className="columns-2 gap-2 space-y-2 mt-4">
-                        {Array.from({ length: 6 }).map((_, i) => (
+                        {Array.from({ length: 9 }).map((_, i) => (
                             <div
                                 key={i}
                                 className="w-full h-40 bg-gray-200 rounded-lg animate-pulse"
@@ -258,7 +257,9 @@ export default function Videos() {
                                         />
                                         <span className="font-semibold">storythur</span>
                                     </div>
-                                    <h3 className="font-bold text-lg">{vid.title || "Tanpa Judul"}</h3>
+                                    <h3 className="font-bold text-lg">
+                                        {vid.title || "Tanpa Judul"}
+                                    </h3>
                                     {vid.category && (
                                         <p className="text-sm">Kategori: {vid.category}</p>
                                     )}
@@ -284,7 +285,9 @@ export default function Videos() {
                                     <button>
                                         <i className="ri-chat-3-line"></i>
                                     </button>
-                                    <button onClick={() => handleDownload(vid.videoUrl, vid.title)}>
+                                    <button
+                                        onClick={() => handleDownload(vid.videoUrl, vid.title)}
+                                    >
                                         <i className="ri-download-2-line"></i>
                                     </button>
                                 </div>

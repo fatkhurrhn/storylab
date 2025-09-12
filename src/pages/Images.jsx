@@ -103,9 +103,11 @@ export default function Images() {
             </div>
           ) : (
             <>
-              <h1 className="flex items-center font-semibold gap-2 text-[#355485] text-[15px]">
-                  <i className="ri-arrow-left-line"></i> Images
-              </h1>
+              <Link to="/">
+                  <h1 className="flex items-center font-semibold gap-2 text-[#355485] text-[15px]">
+                    <i className="ri-arrow-left-line"></i> Images
+                  </h1>
+              </Link>
               <button
                 className="text-[#355485]"
                 onClick={() => setShowSearch(true)}
