@@ -12,6 +12,8 @@ import Video from "./pages/Videos";
 import Login from "./pages/settings/Login";
 import ListMenu from "./pages/settings/ListMenu";
 import DetailVideos from "./pages/DetailVideos";
+import Dashboard from "./pages/Dashboard";
+import Checkin from "./pages/Checkin";
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
       <Routes>
         {/* Redirect root "/" ke "/home" */}
         <Route path="/" element={<Navigate to="/home" replace />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/checkin" element={<Checkin />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<ListMenu />} />
